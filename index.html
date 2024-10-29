@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云顶小游戏～</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #gameArea {
+            position: relative;
+            width: 90vw;
+            height: 70vh;
+            border: 2px solid #333;
+            overflow: hidden;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .square {
+            position: absolute;
+            background-color: #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #score, #timer {
+            font-size: 24px;
+            margin: 10px;
+        }
+
+        #rulesButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #rulesModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rulesContent {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>点击方块游戏</h1>
+    <div id="score">得分: 0</div>
+    <div id="timer">时间: 30秒</div>
+    <button id="rulesButton">游戏规则</button>
+    <div id="gameArea"></div>
+
+    <div id="rulesModal">
+        <div id="rulesContent">
+            <h2>游戏规则</h2>
+            <p>1. 点击出现的方块以获得得分。</p>
+            <p>2. 方块会随机出现并在1秒后消失。</p>
+            <p>3. 游戏时间为30秒，尽量获得更高的得分！</p>
+            <button id="closeRules">关闭</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy;2024归 陈飞鸣（云顶工作室）所有. 保留所有权利.</p>
+    </footer>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('timer');
+        const rulesButton = document.getElementById('rulesButton');
+        const rulesModal = document.getElementById('rulesModal');
+        const closeRulesButton = document.getElementById('closeRules');
+        let score = 0;
+        let square;
+        let gameTime = 30; // 游戏时间
+        let gameInterval;
+
+        function createSquare() {
+            if (square) {
+                square.remove(); // 移除之前的方块
+            }
+
+            square = document.createElement('div');
+            square.classList.add('square');
+
+            // 随机位置
+            const size = Math.random() * 50 + 30; // 方块大小在30到80之间
+            const x = Math.random() * (gameArea.clientWidth - size);
+            const y = Math.random() * (gameArea.clientHeight - size);
+            square.style.width = `${size}px`;
+            square.style.height = `${size}px`;
+            square.style.left = `${x}px`;
+            square.style.top = `${y}px`;
+
+            gameArea.appendChild(square);
+
+            // 设置方块消失的时间
+            setTimeout(() => {
+                if (square) {
+                    square.remove();
+                }
+            }, 1000); // 1秒后方块消失
+
+            square.addEventListener('click', () => {
+                score++;
+                scoreDisplay.textContent = `得分: ${score}`;
+                createSquare(); // 点击后创建新的方块
+            });
+        }
+
+        function startGame() {
+            score = 0;
+            scoreDisplay.textContent = `得分: ${score}`;
+            gameTime = 30; // 重置时间
+            timerDisplay.textContent = `时间: ${gameTime}秒`;
+            createSquare();
+
+            gameInterval = setInterval(() => {
+                gameTime--;
+                timerDisplay.textContent = `时间: ${gameTime}秒`;
+                if (gameTime <= 0) {
+                    clearInterval(gameInterval);
+                    alert(`游戏结束！你的得分是: ${score}`);
+                    gameArea.innerHTML = ''; // 清空游戏区域
+                }
+            }, 1000); // 每秒更新计时器
+        }
+
+        // 规则按钮事件
+        rulesButton.addEventListener('click', () => {
+            rulesModal.style.display = 'flex';
+        });
+
+        // 关闭规则模态框
+        closeRulesButton.addEventListener('click', () => {
+            rulesModal.style.display = 'none';
+        });
+
+        // 开始游戏
+        startGame();
+    </script>
+</body>
+</html>
